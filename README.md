@@ -4,7 +4,7 @@
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-2563eb)
 ![Node.js >= 22.19](https://img.shields.io/badge/Node.js-%3E%3D22.19-339933)
-![DSH >= 0.1.0-rc.8](https://img.shields.io/badge/DSH-%3E%3D0.1.0--rc.8-4f46e5)
+![DSH >= 0.1.0-rc.8+](https://img.shields.io/badge/DSH-%3E%3D0.1.0--rc.8-4f46e5)
 ![Status: developer preview](https://img.shields.io/badge/status-developer%20preview-f59e0b)
 
 面向 DeepSeek Harness rc8 的安全自重启与同会话续接：等待工作排空、展示真实状态、由外部监督器重新拉起后端，并在续接落盘后自动恢复 Web 页面。
