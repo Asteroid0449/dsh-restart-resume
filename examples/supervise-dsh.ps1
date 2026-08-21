@@ -6,7 +6,8 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$WorkspacePath,
 
-  [string]$ExpectedVersion = '0.1.0-rc.8',
+  [Parameter(Mandatory = $true)]
+  [string]$ExpectedVersion,
 
   [ValidateRange(1, 100)]
   [int]$MaxRestarts = 3,
@@ -19,11 +20,24 @@ $ErrorActionPreference = 'Stop'
 $restartExitCode = 75
 $restartTimes = [System.Collections.Generic.List[DateTimeOffset]]::new()
 
+function Resolve-DshVersion {
+  param([string]$CliPath)
+  # No-pipe capture: `| Select-Object -First 1` terminates the pipeline early and
+  # ends the upstream node process, which makes $LASTEXITCODE report -1 on
+  # Windows PowerShell 5.1 instead of the real exit code. `-join ''` preserves
+  # the real exit code and fails to an empty string when node cannot run.
+  $version = ((& node $CliPath --version) -join '').Trim()
+  if ($LASTEXITCODE -ne 0 -or $version -eq '') {
+    throw "Cannot resolve DSH runtime version from $CliPath (node exit code $LASTEXITCODE)"
+  }
+  return $version
+}
+
 $resolvedCli = (Resolve-Path -LiteralPath $DshCliPath -ErrorAction Stop).Path
 $resolvedWorkspace = (Resolve-Path -LiteralPath $WorkspacePath -ErrorAction Stop).Path
-$runtimeVersion = (& node $resolvedCli --version | Select-Object -First 1).Trim()
+$runtimeVersion = Resolve-DshVersion -CliPath $resolvedCli
 
-if ($LASTEXITCODE -ne 0 -or $runtimeVersion -ne $ExpectedVersion) {
+if ($runtimeVersion -ne $ExpectedVersion) {
   throw "Refusing to start an unexpected DSH build: expected $ExpectedVersion, got $runtimeVersion"
 }
 
@@ -32,6 +46,16 @@ $env:DSH_RUNTIME_VERSION = $runtimeVersion
 Set-Location -LiteralPath $resolvedWorkspace
 
 while ($true) {
+  # Re-verify and re-stamp the version on every launch: the supervisor may
+  # outlive a bin.js upgrade/rollback (long-lived process), and each child
+  # inherits this process's environment. Without the refresh, dsh_restart_status
+  # would keep reporting the boot-time version even though bin.js changed.
+  $runtimeVersion = Resolve-DshVersion -CliPath $resolvedCli
+  if ($runtimeVersion -ne $ExpectedVersion) {
+    throw "Refusing to start an unexpected DSH build: expected $ExpectedVersion, got $runtimeVersion"
+  }
+  $env:DSH_RUNTIME_VERSION = $runtimeVersion
+
   $env:DSH_BOOT_ID = [Guid]::NewGuid().ToString('N')
   Write-Host "Starting DSH $runtimeVersion (boot $($env:DSH_BOOT_ID))..."
   & node $resolvedCli web --no-open

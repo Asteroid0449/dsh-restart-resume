@@ -1,6 +1,6 @@
 {
   "name": "dsh-restart-resume",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Drain-aware supervised restart, Web status countdown, and same-session continuation for DeepSeek Harness.",
   "repository": {
     "type": "git",
