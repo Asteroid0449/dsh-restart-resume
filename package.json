@@ -1,0 +1,59 @@
+{
+  "name": "dsh-restart-resume",
+  "version": "0.2.2",
+  "description": "Drain-aware supervised restart, Web status countdown, and same-session continuation for DeepSeek Harness.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Asteroid0449/dsh-restart-resume.git"
+  },
+  "homepage": "https://github.com/Asteroid0449/dsh-restart-resume#readme",
+  "bugs": {
+    "url": "https://github.com/Asteroid0449/dsh-restart-resume/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "docs/SUPERVISOR.md",
+    "examples/supervise-dsh.ps1",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0",
+    "dsh": ">=0.1.0-rc.8"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "restart",
+    "resume"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}

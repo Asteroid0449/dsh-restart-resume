@@ -1,0 +1,12 @@
+- insert:
+    - id: restart-resume
+      name: 'dsh-restart-resume'
+      config:
+        maxRestarts: 3
+        restartWindowSeconds: 600
+        resumeTtlSeconds: 86400
+        defaultDelaySeconds: 10
+        drainTimeoutSeconds: 1800
+        finalCountdownSeconds: 10
+        pollIntervalMs: 250
+        resumePrompt: 'DSH 已完成本会话请求的受控重启。此次重启只是原始大任务中的一个检查点，而非任务本身。继续完成重启后的配置、集成、必要验证和交付；复用已有持久化结果，只做继续推进所需的状态检查，不要重复已经完成的大范围工作或扩大范围。除非原始任务确已完成，否则不要只报告重启成功就停止。Web 客户端会在会话恢复后自动重连并刷新；不要仅因重启或插件激活要求用户手动刷新，只有在恢复后的实际检查证明页面仍为旧状态时才建议手动刷新。'
